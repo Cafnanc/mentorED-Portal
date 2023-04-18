@@ -2,7 +2,10 @@
     <mat-card fxLayout="column" fxFlex="57%" fxFlex.sm="77%" fxFlex.xs="98%" fxFlex.md="70%" fxLayoutAlign="center center">
         <app-image-upload [imgData]="imgData" (imageEvent)="imageEvent($event)"></app-image-upload>
         <div class="form-wrapper" fxFlex="80%">
-            <app-dynamic-form *ngIf="formData" [jsonFormData]="formData" [uiConfig]="uiConfig" #createSession></app-dynamic-form>
+            <!-- <app-dynamic-form *ngIf="formData" [jsonFormData]="formData" [uiConfig]="uiConfig" #createSession></app-dynamic-form> -->
+            <button (click)="select('gmeet')">meet</button>
+            <button (click)="select('zoom')">zoom</button>
+            <app-dynamic-form *ngIf="formData" [jsonFormData]="formData"></app-dynamic-form>
         </div>
         <div fxLayoutAlign="center center">
             <button mat-raised-button class="button-shadow" color="primary" [disabled]="createSession && !createSession.myForm.valid" (click)="onSubmit()">{{"PUBLISH" | translate}}</button>

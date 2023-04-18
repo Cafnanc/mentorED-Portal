@@ -24,7 +24,7 @@ import { ExitPopupComponent } from 'src/app/shared/components/exit-popup/exit-po
   templateUrl: './create-session.component.html',
   styleUrls: ['./create-session.component.scss']
 })
-export class CreateSessionComponent implements OnInit,CanLeave {
+export class CreateSessionComponent implements OnInit, CanLeave {
   @ViewChild('createSession') createSession: DynamicFormComponent;
   imgData = {
     type: 'session',
@@ -34,14 +34,69 @@ export class CreateSessionComponent implements OnInit,CanLeave {
   defaultImageArray = []
   formData: any;
   localImage: any;
-  isSaved:any = false;
+  isSaved: any = false;
   uiConfig = {
     appearance: 'fill',
     floatLabel: 'always'
   }
   sessionDetails: any;
   sessionId: any;
-  imageChanged:any = false;
+  imageChanged: any = false;
+
+  gmeetForm =  {
+    controls: [{
+    name: 'link',
+    label: 'Meet link',
+    value: '',
+    type: 'text',
+    placeHolder: 'Eg: https://meet.google.com/akj-viyc-qng',
+    errorMessage: 'Please provide a valid meet credential',
+    validators: {
+      // required: true,
+      // pattern: '[A-Za-z0-9._%-]+@[A-Za-z0-9._%-]+\\.[a-z]{2,3}'
+    },
+  }]
+}
+
+  zoomForm = {
+    controls: [{
+    name: 'link',
+    label: 'Zoom link',
+    value: '',
+    type: 'text',
+    placeHolder: 'Eg: https://us05web.zoom.us/j/8545020401',
+    errorMessage: 'Please provide a zoom link',
+    validators: {
+      // required: true,
+      // pattern: '[A-Za-z0-9._%-]+@[A-Za-z0-9._%-]+\\.[a-z]{2,3}'
+    },
+  },
+  {
+    name: 'id',
+    label: 'Meeting id',
+    value: '',
+    type: 'number',
+    placeHolder: 'Eg: 854 502 0401',
+    errorMessage: 'Please provide a valid meeting id',
+    validators: {
+      // required: true,
+      // pattern: '[A-Za-z0-9._%-]+@[A-Za-z0-9._%-]+\\.[a-z]{2,3}'
+    },
+  },
+  {
+    name: 'password',
+    label: 'Password',
+    value: '',
+    type: 'text',
+    placeHolder: 'Eg: aNe3eb',
+    errorMessage: 'Please provide the password',
+    validators: {
+      // required: true,
+      // pattern: '[A-Za-z0-9._%-]+@[A-Za-z0-9._%-]+\\.[a-z]{2,3}'
+    },
+  }]
+}
+
   private unsubscriber: Subject<void> = new Subject<void>();
   constructor(private form: FormService, private apiService: ApiService, private changeDetRef: ChangeDetectorRef, private http: HttpClient, private sessionService: SessionService, private location: Location, private toast: ToastService, private localStorage: LocalStorageService,
     private route: ActivatedRoute, private router: Router,
@@ -49,7 +104,7 @@ export class CreateSessionComponent implements OnInit,CanLeave {
     this.sessionId = this.route.snapshot.paramMap.get('id')
   }
   canDeactivate(): Observable<boolean> | Promise<boolean> | boolean {
-    if (!this.isSaved && this.createSession.myForm.dirty  || (this.imageChanged) ) {
+    if (!this.isSaved && this.createSession.myForm.dirty || (this.imageChanged)) {
       let dialog = this.dialog.open(ExitPopupComponent, {
         data: {
           header: "Exit this page?",
@@ -60,34 +115,42 @@ export class CreateSessionComponent implements OnInit,CanLeave {
       })
       return dialog.afterClosed().pipe(
         map(((res) => {
-            console.log(res)
-            return res
-          }))
+          console.log(res)
+          return res
+        }))
       )
-     } else {
-       return true;
-     }
-   }
+    } else {
+      return true;
+    }
+  }
   ngOnInit(): void {
-    if(this.sessionId){
+    if (this.sessionId) {
       this.sessionDetailApi()
-    }else {
+    } else {
       this.getFormDetails()
     }
   }
-  getFormDetails(){
-    this.form.getForm(CREATE_SESSION_FORM).subscribe((form)=>{
-      this.formData = form;
+  getFormDetails() {
+    this.form.getForm(CREATE_SESSION_FORM).subscribe((form) => {
+      // this.formData = form;
       this.changeDetRef.detectChanges();
-      if(this.sessionDetails){
+      if (this.sessionDetails) {
         this.preFillData(this.sessionDetails);
         this.changeDetRef.detectChanges();
       }
-    }) 
+    })
   }
- 
+
+  select(event: any) {
+    if(event=='gmeet') {
+      this.formData = this.gmeetForm
+    } else {
+      this.formData = this.zoomForm
+    }
+  }
+
   imageEvent(event: any) {
-    if(event){
+    if (event) {
       this.localImage = event.target.files[0];
       var reader = new FileReader();
       reader.readAsDataURL(event.target.files[0]);
@@ -114,13 +177,13 @@ export class CreateSessionComponent implements OnInit,CanLeave {
         this.getImageUploadUrl(this.localImage).subscribe()
       } else {
         const form = Object.assign({}, this.createSession.myForm.value);
-        form.startDate = new Date(moment(form.startDate).seconds(0).toISOString()).getTime()/1000;
-        form.endDate = new Date(moment(form.endDate).seconds(0).toISOString()).getTime()/1000;
+        form.startDate = new Date(moment(form.startDate).seconds(0).toISOString()).getTime() / 1000;
+        form.endDate = new Date(moment(form.endDate).seconds(0).toISOString()).getTime() / 1000;
         const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
         form.timeZone = timezone;
         this.createSession.myForm.markAsPristine();
-        this.sessionService.createSession(form,this.sessionDetails?._id).subscribe((result)=>{
-          result._id ? this.router.navigate([`/${"session-detail"}/${result._id}`], {replaceUrl: true}): this.location.back();
+        this.sessionService.createSession(form, this.sessionDetails?._id).subscribe((result) => {
+          result._id ? this.router.navigate([`/${"session-detail"}/${result._id}`], { replaceUrl: true }) : this.location.back();
         });
       }
     }
@@ -146,8 +209,8 @@ export class CreateSessionComponent implements OnInit,CanLeave {
     };
     return this.http.put(path.signedUrl, file);
   }
-  sessionDetailApi(){
-    this.sessionService.getSessionDetailsAPI(this.sessionId).subscribe((response: any) =>{
+  sessionDetailApi() {
+    this.sessionService.getSessionDetailsAPI(this.sessionId).subscribe((response: any) => {
       this.sessionDetails = response;
       this.getFormDetails()
     })
@@ -155,7 +218,7 @@ export class CreateSessionComponent implements OnInit,CanLeave {
   preFillData(existingData: any) {
     this.imgData.image = (existingData['image'][0]) ? existingData['image'][0] : '';
     for (let i = 0; i < this.formData.controls.length; i++) {
-      this.formData.controls[i].value = (this.formData.controls[i].type == 'date')? moment.unix(existingData[this.formData.controls[i].name]).format():existingData[this.formData.controls[i].name];
+      this.formData.controls[i].value = (this.formData.controls[i].type == 'date') ? moment.unix(existingData[this.formData.controls[i].name]).format() : existingData[this.formData.controls[i].name];
       this.formData.controls[i].options = _.unionBy(this.formData.controls[i].options, this.formData.controls[i].value, 'value');
     }
   }

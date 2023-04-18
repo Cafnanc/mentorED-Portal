@@ -46,9 +46,11 @@ export class EditProfileComponent implements OnInit, CanLeave {
   ngOnInit(): void {
     this.formService.getForm(EDIT_PROFILE_FORM).subscribe((form) => {
       this.formData = form
+      console.log(form)
       this.localStorage.getLocalData(localKeys.USER_DETAILS).then((user) => {
         if (user) {
           this.imgData.image = (user.image) ? user.image : '';
+          console.log(JSON.parse(user))
           this.preFillData(JSON.parse(user));
           this.changeDetRef.detectChanges();
         }
@@ -56,6 +58,7 @@ export class EditProfileComponent implements OnInit, CanLeave {
     }) 
   }
   canDeactivate(): Observable<boolean> | Promise<boolean> | boolean {
+    console.log(!this.isSaved, this.editProfile.myForm.dirty , (this.imageChanged))
     if (!this.isSaved && this.editProfile.myForm.dirty || (this.imageChanged)) {
       let dialog = this.dialog.open(ExitPopupComponent, {
         data: {
