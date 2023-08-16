@@ -1,5 +1,5 @@
-import { NgModule, isDevMode } from '@angular/core';
-import { BrowserModule, Title } from '@angular/platform-browser';
+import { NgModule } from '@angular/core';
+import { BrowserModule, Title, provideClientHydration } from '@angular/platform-browser';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -13,7 +13,7 @@ import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { NgxIndexedDBModule, DBConfig } from 'ngx-indexed-db';
 import { DbConfig } from './core/constants/dbConfig';
 import { ServiceWorkerModule } from '@angular/service-worker';
-import { environment } from '../environments/environment';
+import { FlexLayoutServerModule } from '@angular/flex-layout/server';
 
 const dbConfig:DBConfig = DbConfig;
 
@@ -47,10 +47,12 @@ export function translateHttpLoaderFactory(httpClient: HttpClient) {
       // Register the ServiceWorker as soon as the application is stable
       // or after 30 seconds (whichever comes first).
       registrationStrategy: 'registerWhenStable:30000'
-    })
+    }),
+    FlexLayoutServerModule
   ],
   providers: [
-    Title
+    Title,
+    provideClientHydration()
   ],
   bootstrap: [AppComponent]
 })

@@ -56,13 +56,11 @@ export class LoginComponent implements OnInit {
 
   async getRemeberdDetails() {
     const rememberdDetails = await this.localStorage.getLocalData(localKeys.REMEMBER_ME);
-    let details: any = null;
-    details
     if (rememberdDetails) {
-      details = JSON.parse(atob(rememberdDetails));
-    }
-    for (const control of this.controls.controls) {
-      control["value"] = details ? details[control.type] : '';
+      let details = JSON.parse(atob(rememberdDetails));
+      for (const control of this.controls.controls) {
+        control["value"] = details ? details[control.type] : '';
+      }
     }
     this.formData.controls = this.controls.controls;
 
