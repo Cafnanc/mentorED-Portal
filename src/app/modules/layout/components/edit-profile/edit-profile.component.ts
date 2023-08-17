@@ -1,10 +1,8 @@
-import { Location } from '@angular/common';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { ChangeDetectorRef, Component, HostListener, OnInit, ViewChild } from '@angular/core'
+import { HttpClient } from '@angular/common/http';
+import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core'
 import { MatDialog } from '@angular/material/dialog';
-import { Router } from '@angular/router';
-import * as _ from 'lodash';
-import { fromEvent, map, Observable, Subject, takeUntil } from 'rxjs';
+import * as _ from 'lodash-es';
+import { map, Observable, Subject } from 'rxjs';
 import { API_CONSTANTS } from 'src/app/core/constants/apiUrlConstants';
 import { EDIT_PROFILE_FORM } from 'src/app/core/constants/formConstant';
 import { localKeys } from 'src/app/core/constants/localStorage.keys';
